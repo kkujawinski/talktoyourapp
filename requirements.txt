@@ -3,3 +3,4 @@ waitress
 dj-paas-env>=0.6.1
 dj-static
 psycopg2
+jinja2

@@ -22,11 +22,6 @@ SECRET_KEY = ')po&blm4y#980ywj-07+2xm+n@=q+m-)%)9^%$_#+87w^@fx0v'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -87,3 +82,10 @@ STATICFILES_DIRS = (
 )
 from dj_paas_env import static
 STATIC_ROOT = static.root()
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'APP_DIRS': True,
+    },
+]
