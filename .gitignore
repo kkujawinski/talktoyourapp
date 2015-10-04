@@ -60,3 +60,5 @@ target/
 
 # Django
 /data/database.sqlite3
+
+env.local.sh
