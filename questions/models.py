@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from participants.models import Participant
 
@@ -22,10 +23,28 @@ class Answer(models.Model):
 class GivenAnswer(models.Model):
     participant = models.ForeignKey(Participant)
     question = models.ForeignKey(Question)
-    given_answer = models.ForeignKey(Answer)
+    given_answer = models.ForeignKey(Answer, null=True)
 
     class Meta:
-        unique_together = (("participant", "given_answer"), ("participant", "question"))
+        unique_together = (
+            ("participant", "given_answer"),
+            ("participant", "question")
+        )
 
     def __str__(self):
         return "%s %s" % (self.question, self.given_answer)
+
+
+class Timer(models.Model):
+    participant = models.OneToOneField(Participant)
+    question_started = models.DateTimeField(null=True)
+    time = models.FloatField(default=0)
+
+    def start(self):
+        self.question_started = timezone.now()
+        self.save()
+
+    def stop(self):
+        q_time = timezone.now() - self.question_started()
+        self.time += q_time.total_seconds()
+        self.save()
