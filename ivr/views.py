@@ -3,17 +3,16 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from ivr.utils import next_question
 from participants.models import Participant
-from questions.models import Question, Answer, GivenAnswer, Timer
-
+from questions.models import Answer, GivenAnswer, Question, Timer
 from twilio import twiml
 from twilio.rest import TwilioRestClient
-
 
 VOICE = {'voice': 'alice', 'language': 'pl-PL'}
 
 
-def initiate_call(request, participant_id):
-    participant = Participant.get(id=participant_id)
+def initiate_call(request, participant):
+    if isinstance(participant, int):
+        participant = Participant.get(id=participant)
     client = TwilioRestClient(
         settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
     )
@@ -45,6 +44,7 @@ def receive_call(request):
 
 def welcome(request, participant_id):
     participant = Participant.get(id=participant_id)
+    participant.start_call()
     response = twiml.Response()
     response.pause(length=2)
     response.say(
@@ -58,7 +58,7 @@ def welcome(request, participant_id):
 
 
 def question(request, participant_id):
-    participant = Participant.get(id=participant_id)
+    participant = Participant.objects.get(id=participant_id)
     response = twiml.Response()
     question = next_question(participant)
 
@@ -129,3 +129,9 @@ def answer(request, participant_id, question_id):
     )
 
     return HttpResponse(response)
+
+
+def on_call_end(request):
+    phone_number = request.POST['From']
+    participant = Participant.objects.get(phone_number=phone_number)
+    participant.end_active_call()
