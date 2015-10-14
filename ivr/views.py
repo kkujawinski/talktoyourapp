@@ -71,8 +71,8 @@ def question(request, participant_id):
     if question:
         answers = Answer.objects.filter(question=question).order_by('pk')
         answers_txt = ' '.join([
-            '{}. {}'.format(i, answer.answer)
-            for i, answer in enumerate(answers)
+            '{}) {}. \n'.format(i, answer.answer)
+            for i, answer in enumerate(answers, 1)
         ])
         question_txt = '{} {}'.format(question.question, answers_txt)
 
@@ -119,7 +119,7 @@ def answer(request, participant_id, question_id):
         try:
             answers = Answer.objects.filter(
                 question__id=question_id).order_by('pk')
-            answer = answers[int(choice)]
+            answer = answers[int(choice) - 1]
         except IndexError:
             pass
 
