@@ -1,18 +1,20 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from ivr.utils import next_question
 from participants.models import Participant
-from questions.models import Answer, GivenAnswer, Question, Timer
+from questions.models import Question, Answer, GivenAnswer, Timer
+
 from twilio import twiml
 from twilio.rest import TwilioRestClient
+
 
 VOICE = {'voice': 'alice', 'language': 'pl-PL'}
 
 
-def initiate_call(request, participant):
-    if isinstance(participant, int):
-        participant = Participant.get(id=participant)
+def initiate_call(request, participant_id):
+    participant = Participant.objects.get(id=participant_id)
     client = TwilioRestClient(
         settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
     )
@@ -23,6 +25,7 @@ def initiate_call(request, participant):
         to=participant.phone_number,
         from_=settings.TWILIO_CALLING_NUMBER
     )
+    return HttpResponse('ok!')
 
 
 def receive_call(request):
@@ -30,7 +33,7 @@ def receive_call(request):
     response = twiml.Response()
     response.pause(length=2)
     try:
-        Participant.get(phone_number=phone_number)
+        Participant.objects.get(phone_number=phone_number)
     except Participant.DoesNotExist:
         response.say(
             'Proszę zarejestrować się za pośrednictwem SMS.', **VOICE
@@ -42,21 +45,24 @@ def receive_call(request):
     return HttpResponse(response)
 
 
+@csrf_exempt
 def welcome(request, participant_id):
-    participant = Participant.get(id=participant_id)
-    participant.start_call()
+    participant = Participant.objects.get(id=participant_id)
     response = twiml.Response()
     response.pause(length=2)
     response.say(
         'Witaj {}. Czas na pytania!'.format(participant.name), **VOICE
     )
     response.redirect(
-        reverse('ivr:question'), kwargs={'participant_id': participant.id}
+        reverse('ivr:question', kwargs={'participant_id': participant.id})
     )
-    Timer(participant=participant)  # Rozpoczynamy mierzenie czasu!
+    timer, created = Timer.objects.get_or_create(participant=participant)
+    if created:
+        timer.save()
     return HttpResponse(response)
 
 
+@csrf_exempt
 def question(request, participant_id):
     participant = Participant.objects.get(id=participant_id)
     response = twiml.Response()
@@ -94,14 +100,15 @@ def question(request, participant_id):
 
     else:
         response.say('To już wszystkie pytania.', **VOICE)
-        response.redirect(reverse('ivr:summary'))
+        # response.redirect(reverse('ivr:summary'))
 
     return HttpResponse(response)
 
 
+@csrf_exempt
 def answer(request, participant_id, question_id):
-    participant = Participant.get(id=participant_id)
-    question = Question.get(id=question_id)
+    participant = Participant.objects.get(id=participant_id)
+    question = Question.objects.get(id=question_id)
     choice = request.POST.get('Digits')
     answer = None
     response = twiml.Response()
@@ -118,14 +125,14 @@ def answer(request, participant_id, question_id):
 
     GivenAnswer(
         participant=participant, question=question, given_answer=answer
-    )
+    ).save()
 
     if answer and answer.correct:
         response.say('Brawo, prawidłowa odpowiedź!', **VOICE)
     else:
         response.say('Niestety, nieprawidłowa odpowiedź.', **VOICE)
     response.redirect(
-        reverse('ivr:question'), kwargs={'participant_id': participant.id}
+        reverse('ivr:question', kwargs={'participant_id': participant.id})
     )
 
     return HttpResponse(response)
