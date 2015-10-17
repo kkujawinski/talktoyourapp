@@ -88,6 +88,10 @@ def question(request, participant_id):
 
     else:
         response.say('To już wszystkie pytania.', **VOICE)
+        summary_text = 'Udzielono %d prawidłowych odpowiedzi w czasie %d sekund.' % (
+            participant.correct_answers, int(participant.timer.time)
+        )
+        response.say(summary_text, **VOICE)
         # response.redirect(reverse('ivr:summary'))
 
     return HttpResponse(response)
