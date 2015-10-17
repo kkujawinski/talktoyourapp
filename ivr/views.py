@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from ivr.utils import next_question
 from participants.models import Participant
 from questions.models import Question, Answer, Timer
@@ -10,6 +11,9 @@ from twilio import twiml
 
 VOICE = {'voice': 'alice', 'language': 'pl-PL'}
 
+
+@csrf_exempt
+@require_http_methods(["POST"])
 def receive_call(request):
     try:
         phone_number = request.POST['From']
@@ -32,6 +36,7 @@ def receive_call(request):
 
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def welcome(request, participant_id):
     participant = Participant.objects.get(id=participant_id)
     participant.start_call()
@@ -50,6 +55,7 @@ def welcome(request, participant_id):
 
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def question(request, participant_id):
     participant = Participant.objects.get(id=participant_id)
     response = twiml.Response()
@@ -97,6 +103,7 @@ def question(request, participant_id):
 
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def answer(request, participant_id, question_id):
     participant = Participant.objects.get(id=participant_id)
     question = Question.objects.get(id=question_id)
@@ -122,8 +129,8 @@ def answer(request, participant_id, question_id):
     return HttpResponse(response)
 
 
-
 @csrf_exempt
+@require_http_methods(["POST"])
 def call_status(request):
     try:
         phone_number = request.POST['To']
