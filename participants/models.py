@@ -11,6 +11,7 @@ class ParticipantModelManager(models.Manager):
         if not created:
             participant.name = name
             participant.save()
+        return created
 
 
 class Participant(models.Model):
