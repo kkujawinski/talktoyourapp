@@ -111,7 +111,7 @@ def answer(request, participant_id, question_id):
         except IndexError:
             pass
 
-    participant.answer(question=question, given_answer=answer)
+    participant.answer(question=question, answer=answer)
     response.redirect(
         reverse('ivr:question', kwargs={'participant_id': participant.id})
     )
