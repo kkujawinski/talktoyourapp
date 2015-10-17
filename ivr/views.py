@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from ivr.utils import next_question
 from participants.models import Participant
@@ -12,7 +12,11 @@ VOICE = {'voice': 'alice', 'language': 'pl-PL'}
 
 
 def receive_call(request):
-    phone_number = request.POST['From']
+    try:
+        phone_number = request.POST['From']
+    except KeyError:
+        return HttpResponseBadRequest()
+
     response = twiml.Response()
     response.pause(length=2)
     try:
@@ -123,8 +127,16 @@ def answer(request, participant_id, question_id):
 
 
 @csrf_exempt
+def summary(request,):
+    pass
+
+
+@csrf_exempt
 def call_status(request):
-    phone_number = request.POST['To']
+    try:
+        phone_number = request.POST['To']
+    except KeyError:
+        return HttpResponseBadRequest()
     participant = Participant.objects.get(phone_number=phone_number)
     participant.end_active_call()
     return HttpResponse()

@@ -90,13 +90,11 @@
         <div class="container text-center">
             <div class="row">
                 <h1 class="title">Konkurs</h1>
-                <p>Wszyscy zarejestrowani uczestnicy po prezentacji ortzymają telefon z listą pytań dotyczących spraw wszelakich. Nagrodami są</p>
-
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="service-item">
                         <img src="{{ static('assets/img/services/responsive.png') }}" alt="">
                         <h3>Rejestracja</h3>
-                        <p>Wyślij sms ze swoim nickem pod numer +48 12345678</p>
+                        <p>Wyślij sms ze swoim nickem pod numer {{ phone_number }}</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
@@ -104,7 +102,9 @@
                         <img src="{{ static('assets/img/services/bs3.png') }}" alt="">
                         <h3>Aktualni uczestnicy</h3>
                         <ol class="text-left">
-                            <li>Boss (...948)</li>
+                            {% for participant in participants %}
+                                <li>{{ participant }}</li>
+                            {% endfor %}
                         </ol>
                     </div>
                 </div>
@@ -113,17 +113,10 @@
                         <img src="{{ static('assets/img/services/free.png') }}" alt="">
                         <h3>Zasady</h3>
                         <ol class="text-left">
-                            <li>rejestracja smsem z nazwą (emailem?)</li>
-                            <li>odesłanie potwierdzenia</li>
-                            <li>po prezentacji telefon od aplikacji do uczestników z pytaniami konkursowymi, odpowiedzi są przy pomocy tonowo wybieranych numerów,
-                                <ul>
-                                    <li>wszyscy mają te same pytania, ale są podane w losowej kolejności i losowa kolejność odpowiedzi (żeby uniknąć zapamiętania kolejności odpowiedzi z jednego konta i udzielania na szybko z drugiego),</li>
-                                    <li>warto się zastanowić kiedy dzwonić, żeby komuś nie przeszkadzać w prezentacjach,</li>
-                                    <li>jeżeli ktoś nie odbierze, to wysyłamy smsa z informacją, że ma oddzwonić i odpowiedzieć na pytania w ciągu kilku godzin.</li>
-                                    <li>o zwycięzcach decyduje liczba prawidłowo udzielonych odpowiedzi + czas (nie można oddać głosu dopóki nie zostaną odczytane wszystkie odpowiedzi?),</li>
-                                    <li>strona główna aplikacji prezentuje aktualny ranking uczestników,</li>
-                                </ul>
-                            </li>
+                            <li>Rejestracja w konkursie następuje przez wysłanie smsa z loginem pod numer {{ phone_number }}.</li>
+                            <li>Po zakończeniu prezentacji konkurs zostanie rozpoczęty i do każdego zarejestrowanego uczestnika zadzwoni telefon</li>
+                            <li>W trakcie rozmowy telefonicznej należy udzielić odpowiedzi na zadane pytania.</li>
+                            <li>Zwycięzcy zostaną wyłonieni na podstawie prawidłowych odpowiedzi oraz czasu udzielania odpowiedzi.</li>
                         </ol>
                     </div>
                 </div>
@@ -142,14 +135,17 @@
                         <div style="font-size: 12em;">
                             <i class="fa fa-github"></i>
                         </div>
+                        Wkrótce
+                        {# 
                         <a href="https://github.com/kkujawinski/talktoyourapp">https://github.com/kkujawinski/talktoyourapp</a>
+                        #}
                     </div>
                     <div class="col-sm-6 col-xs-12">
                         <h2>Slajdy</h2>
                         <div style="font-size: 12em;">
-                            <i class="fa fa-slideshare"></i>
+                            <i class="fa fa-desktop"></i>
                         </div>
-                        <a href="">https://slideshare/xyz</a>
+                        Wkrótce
                         <p>
                     </div>
                 </div>
@@ -166,7 +162,7 @@
                     <h2>Kamil Kujawiński</h2>
                     <img src="{{ static('assets/img/kkujawinski_avatar.png') }}" alt="" class="col-md-4 col-sm-5 col-sm-offset-0 col-xs-4 col-xs-offset-4 img-circle">
                     <div class="col-md-8 col-sm-7 col-xs-12 text-left">
-                        <p>Programista Pythona od paru lat. Pracował w STX Next, teraz sam pracuje dla zagranicznych klientów.</p>
+                        <p>Pragmatyczny programista Pythona. Fan hackatonów, hackfestów, Battlehacków.</p>
                         <p><i class="fa fa-envelope"></i> kamil@kujawinski.net</p>
                         <p><i class="fa fa-linkedin-square"></i> <a href="https://pl.linkedin.com/in/kkujawinski">Kamil Kujawiński</a></p>
                     </div>
@@ -182,7 +178,7 @@
     <div id="copyright">
         <div class="container">
             <div class="col-md-10">
-                <p>© Corporal 2014 All right reserved. Design & Developed by <a href="http://graygrids.com">GrayGrids</a></p>
+                <p>© Corporal 2014 All right reserved. Design &amp; Developed by <a href="http://graygrids.com">GrayGrids</a></p>
             </div>
             <div class="col-md-2">
                 <span class="to-top pull-right"><a href="#hero-area"><i class="fa fa-angle-up fa-2x"></i></a></span>
