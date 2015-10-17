@@ -85,18 +85,10 @@ def question(request, participant_id):
         response.say('Oooj...', **VOICE)  # Nie udzielono odpowiedzi. :(
         response.redirect(answer_url)
     else:
-        NUMBERS_TEXT = {
-            0: 'zero',
-            1: 'jeden',
-            2: 'dwa',
-            3: 'trzy',
-            4: 'cztery',
-            5: 'pięć',
-        }
         response.say('To już wszystkie pytania.', **VOICE)
         correct_answers = participant.correct_answers
-        summary_text = 'Prawidłowych odpowiedzi - %d w czasie %d sekund.' % (
-            NUMBERS_TEXT.get(correct_answers, correct_answers), int(participant.timer.time)
+        summary_text = 'Prawidłowych odpowiedzi - "%d" w czasie "%d" sekund.' % (
+            correct_answers, int(participant.timer.time)
         )
         response.say(summary_text, **VOICE)
         # response.redirect(reverse('ivr:summary'))
