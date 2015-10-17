@@ -55,8 +55,6 @@ def initiate_call_action(modeladmin, request, queryset):
         callback_url = request.build_absolute_uri(
             reverse('ivr:call_status')
         )
-        url = url.replace('127.0.0.1:8000', 'b5973660.ngrok.io')
-        callback_url = callback_url.replace('127.0.0.1:8000', 'b5973660.ngrok.io')
 
         client.calls.create(
             url=url,
