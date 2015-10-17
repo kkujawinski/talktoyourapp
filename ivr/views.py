@@ -108,7 +108,6 @@ def answer(request, participant_id, question_id):
     participant = Participant.objects.get(id=participant_id)
     question = Question.objects.get(id=question_id)
     choice = request.POST.get('Digits')
-    answer = None
     response = twiml.Response()
 
     Timer.objects.get(participant=participant).stop()
@@ -119,7 +118,7 @@ def answer(request, participant_id, question_id):
                 question__id=question_id).order_by('pk')
             answer = answers[int(choice) - 1]
         except (IndexError, ValueError):
-            pass
+            participant.answer(question=question, answer=None)
         else:
             participant.answer(question=question, answer=answer)
     response.redirect(
