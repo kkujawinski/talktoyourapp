@@ -87,7 +87,7 @@ def question(request, participant_id):
     else:
         response.say('To już wszystkie pytania.', **VOICE)
         correct_answers = participant.correct_answers
-        summary_text = 'Prawidłowych odpowiedzi - "%d" w czasie "%d" sekund.' % (
+        summary_text = 'Prawidłowych odpowiedzi - \'%d\' w czasie \'%d\' sekund.' % (
             correct_answers, int(participant.timer.time)
         )
         response.say(summary_text, **VOICE)
