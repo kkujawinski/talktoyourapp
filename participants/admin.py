@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from participants.models import Participant
-from questions.models import GivenAnswer
+from questions.models import Question, GivenAnswer
 from ivr.models import CallEntry
 
 from twilio.rest import TwilioRestClient
@@ -67,10 +67,14 @@ initiate_call_action.short_description = "Initiate lottery call"
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'is_call_active', 'correct_answers', 'timer',)
+    list_display = ('__str__', 'is_call_active', 'get_given_answers', 'correct_answers', 'timer',)
     list_filter = (IsCallActiveListFilter,)
     inlines = (GivenAnswerInline, CallEntriesInline)
     actions = (initiate_call_action,)
+
+    def get_given_answers(self, obj):
+        return obj.givenanswer_set.count()
+    get_given_answers.short_description = 'Given answers'
 
 
 admin.site.register(Participant, ParticipantAdmin)
