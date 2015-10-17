@@ -32,6 +32,16 @@ class Participant(models.Model):
         max_length=160,
         null=False
     )
+    correct_answers = models.IntegerField(default=0)
+
+    def answer(self, question, answer):
+        GivenAnswer = get_model('questions', 'GivenAnswer')
+        GivenAnswer(
+            participant=self, question=question, given_answer=answer
+        ).save()
+
+        self.correct_answers = self.givenanswer_set.filter(given_answer__correct=True).count()
+        self.save()
 
     def is_call_active(self):
         return bool(self._get_active_call())

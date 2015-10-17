@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from ivr.utils import next_question
 from participants.models import Participant
-from questions.models import Question, Answer, GivenAnswer, Timer
+from questions.models import Question, Answer, Timer
 
 from twilio import twiml
 
@@ -111,14 +111,7 @@ def answer(request, participant_id, question_id):
         except IndexError:
             pass
 
-    GivenAnswer(
-        participant=participant, question=question, given_answer=answer
-    ).save()
-
-    if answer and answer.correct:
-        response.say('Brawo, prawidłowa odpowiedź!', **VOICE)
-    else:
-        response.say('Niestety, nieprawidłowa odpowiedź.', **VOICE)
+    participant.answer(question=question, given_answer=answer)
     response.redirect(
         reverse('ivr:question', kwargs={'participant_id': participant.id})
     )

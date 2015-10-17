@@ -67,7 +67,7 @@ initiate_call_action.short_description = "Initiate lottery call"
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'is_call_active',)
+    list_display = ('__str__', 'is_call_active', 'correct_answers', 'timer',)
     list_filter = (IsCallActiveListFilter,)
     inlines = (GivenAnswerInline, CallEntriesInline)
     actions = (initiate_call_action,)

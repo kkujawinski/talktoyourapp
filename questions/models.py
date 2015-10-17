@@ -48,3 +48,6 @@ class Timer(models.Model):
         q_time = timezone.now() - self.question_started
         self.time += q_time.total_seconds()
         self.save()
+
+    def __str__(self):
+        return str(self.time)
