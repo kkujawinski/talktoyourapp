@@ -38,6 +38,7 @@ class Participant(models.Model):
 
     def start_call(self):
         CallEntry = get_model('ivr', 'CallEntry')
+        self.callentry_set.filter(end_time__isnull=True).delete()
         CallEntry.objects.create(participant=self)
 
     def end_active_call(self):

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -7,25 +6,9 @@ from participants.models import Participant
 from questions.models import Question, Answer, GivenAnswer, Timer
 
 from twilio import twiml
-from twilio.rest import TwilioRestClient
 
 
 VOICE = {'voice': 'alice', 'language': 'pl-PL'}
-
-
-def initiate_call(request, participant_id):
-    participant = Participant.objects.get(id=participant_id)
-    client = TwilioRestClient(
-        settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
-    )
-    client.calls.create(
-        url=request.build_absolute_uri(
-            reverse('ivr:welcome', kwargs={'participant_id': participant.id})
-        ),
-        to=participant.phone_number,
-        from_=settings.TWILIO_CALLING_NUMBER
-    )
-    return HttpResponse('ok!')
 
 
 def receive_call(request):
@@ -48,6 +31,7 @@ def receive_call(request):
 @csrf_exempt
 def welcome(request, participant_id):
     participant = Participant.objects.get(id=participant_id)
+    participant.start_call()
     response = twiml.Response()
     response.pause(length=2)
     response.say(
@@ -138,7 +122,9 @@ def answer(request, participant_id, question_id):
     return HttpResponse(response)
 
 
-def on_call_end(request):
-    phone_number = request.POST['From']
+@csrf_exempt
+def call_status(request):
+    phone_number = request.POST['To']
     participant = Participant.objects.get(phone_number=phone_number)
     participant.end_active_call()
+    return HttpResponse()

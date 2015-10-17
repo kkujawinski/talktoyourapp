@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from participants.models import Participant
 from questions.models import GivenAnswer
 from ivr.models import CallEntry
-from ivr.views import initiate_call
+
+from twilio.rest import TwilioRestClient
 
 
 class GivenAnswerInline(admin.TabularInline):
@@ -43,7 +46,24 @@ class IsCallActiveListFilter(admin.SimpleListFilter):
 
 def initiate_call_action(modeladmin, request, queryset):
     for participant in queryset:
-        initiate_call(request, participant)
+        client = TwilioRestClient(
+            settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
+        )
+        url = request.build_absolute_uri(
+            reverse('ivr:welcome', kwargs={'participant_id': participant.id})
+        )
+        callback_url = request.build_absolute_uri(
+            reverse('ivr:call_status')
+        )
+        url = url.replace('127.0.0.1:8000', 'b5973660.ngrok.io')
+        callback_url = callback_url.replace('127.0.0.1:8000', 'b5973660.ngrok.io')
+
+        client.calls.create(
+            url=url,
+            status_callback=callback_url,
+            to=participant.phone_number,
+            from_=settings.TWILIO_CALLING_NUMBER
+        )
 
 initiate_call_action.short_description = "Initiate lottery call"
 
