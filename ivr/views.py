@@ -10,7 +10,6 @@ from twilio import twiml
 
 VOICE = {'voice': 'alice', 'language': 'pl-PL'}
 
-
 def receive_call(request):
     try:
         phone_number = request.POST['From']
@@ -85,11 +84,19 @@ def question(request, participant_id):
 
         response.say('Oooj...', **VOICE)  # Nie udzielono odpowiedzi. :(
         response.redirect(answer_url)
-
     else:
+        NUMBERS_TEXT = {
+            0: 'zero',
+            1: 'jeden',
+            2: 'dwa',
+            3: 'trzy',
+            4: 'cztery',
+            5: 'pięć',
+        }
         response.say('To już wszystkie pytania.', **VOICE)
-        summary_text = 'Udzielono %d prawidłowych odpowiedzi w czasie %d sekund.' % (
-            participant.correct_answers, int(participant.timer.time)
+        correct_answers = participant.correct_answers
+        summary_text = 'Prawidłowych odpowiedzi - %d w czasie %d sekund.' % (
+            NUMBERS_TEXT.get(correct_answers, correct_answers), int(participant.timer.time)
         )
         response.say(summary_text, **VOICE)
         # response.redirect(reverse('ivr:summary'))
@@ -122,10 +129,6 @@ def answer(request, participant_id, question_id):
 
     return HttpResponse(response)
 
-
-@csrf_exempt
-def summary(request,):
-    pass
 
 
 @csrf_exempt
