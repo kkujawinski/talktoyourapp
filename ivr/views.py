@@ -118,14 +118,13 @@ def answer(request, participant_id, question_id):
             answers = Answer.objects.filter(
                 question__id=question_id).order_by('pk')
             answer = answers[int(choice) - 1]
-        except IndexError:
+        except (IndexError, ValueError):
             pass
-
-    participant.answer(question=question, answer=answer)
+        else:
+            participant.answer(question=question, answer=answer)
     response.redirect(
         reverse('ivr:question', kwargs={'participant_id': participant.id})
     )
-
     return HttpResponse(response)
 
 
