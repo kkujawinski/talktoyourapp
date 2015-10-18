@@ -5,7 +5,8 @@ from django.views.decorators.http import require_http_methods
 from ivr.utils import next_question
 from participants.models import Participant
 from questions.models import Question, Answer, Timer
-
+from twilio.rest import TwilioRestClient
+from django.conf import settings
 from twilio import twiml
 
 
@@ -136,4 +137,23 @@ def call_status(request):
         return HttpResponseBadRequest()
     participant = Participant.objects.get(phone_number=phone_number)
     participant.end_active_call()
+    return HttpResponse()
+
+
+def inititate(request, participant_id):
+    participant = Participant.objects.get(id=participant_id)
+    client = TwilioRestClient(
+        settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
+    )
+    url = 'https://talktoyourapp.herokuapp.com/ivr/welcome/%d/' % participant.id
+    callback_url = request.build_absolute_uri(
+        reverse('ivr:call_status')
+    )
+
+    client.calls.create(
+        url=url,
+        status_callback=callback_url,
+        to=participant.phone_number,
+        from_=settings.TWILIO_CALLING_NUMBER
+    )
     return HttpResponse()
