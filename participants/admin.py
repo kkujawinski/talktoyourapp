@@ -46,22 +46,25 @@ class IsCallActiveListFilter(admin.SimpleListFilter):
 
 def initiate_call_action(modeladmin, request, queryset):
     for participant in queryset:
-        client = TwilioRestClient(
-            settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
-        )
-        url = request.build_absolute_uri(
-            reverse('ivr:welcome', kwargs={'participant_id': participant.id})
-        )
-        callback_url = request.build_absolute_uri(
-            reverse('ivr:call_status')
-        )
+        try:
+            client = TwilioRestClient(
+                settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
+            )
+            url = request.build_absolute_uri(
+                reverse('ivr:welcome', kwargs={'participant_id': participant.id})
+            )
+            callback_url = request.build_absolute_uri(
+                reverse('ivr:call_status')
+            )
 
-        client.calls.create(
-            url=url,
-            status_callback=callback_url,
-            to=participant.phone_number,
-            from_=settings.TWILIO_CALLING_NUMBER
-        )
+            client.calls.create(
+                url=url,
+                status_callback=callback_url,
+                to=participant.phone_number,
+                from_=settings.TWILIO_CALLING_NUMBER
+            )
+        except Exception:
+            pass
 
 initiate_call_action.short_description = "Initiate lottery call"
 
