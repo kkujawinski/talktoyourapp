@@ -50,9 +50,7 @@ def initiate_call_action(modeladmin, request, queryset):
             client = TwilioRestClient(
                 settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN
             )
-            url = request.build_absolute_uri(
-                'https://talktoyourapp.herokuapp.com/ivr/welcome/%d/' % participant.id
-            )
+            url = 'https://talktoyourapp.herokuapp.com/ivr/welcome/%d/' % participant.id
             callback_url = request.build_absolute_uri(
                 reverse('ivr:call_status')
             )
